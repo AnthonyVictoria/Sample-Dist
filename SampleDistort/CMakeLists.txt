@@ -35,6 +35,7 @@ target_sources(SampleDistort
     PRIVATE
         Source/PluginProcessor.cpp
         Source/PluginEditor.cpp)
+        juce_generate_juce_header(SampleDistort)
 
 target_compile_definitions(SampleDistort
     PUBLIC
