@@ -239,7 +239,10 @@ void SampleDistortAudioProcessorEditor::parentHierarchyChanged()
         return;
     if (auto* peer = getPeer())
     {
-        installMacDropTarget(peer->getNativeHandle(), [this](const juce::String& path) { acceptDroppedPath(path); });
+        installMacDropTarget(peer->getNativeHandle(), [this](const std::string& path)
+        {
+            acceptDroppedPath(juce::String(path));
+        });
         dropInstalled = true;
     }
 }
