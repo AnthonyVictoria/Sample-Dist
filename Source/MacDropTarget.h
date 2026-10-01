@@ -1,6 +1,6 @@
 #pragma once
 
-#include <JuceHeader.h>
 #include <functional>
+#include <string>
 
-void installMacDropTarget(void* nativeView, std::function<void(const juce::String&)> callback);
+void installMacDropTarget(void* nativeView, std::function<void(const std::string&)> callback);
