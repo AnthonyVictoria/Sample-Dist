@@ -13,13 +13,13 @@ jobs:
 
       - name: Clonar JUCE
         working-directory: SampleDistort
-        run: git clone --depth 1 https://github.com/juce-framework/JUCE.git JUCE
+        run: git clone --depth 1 --branch 8.0.4 https://github.com/juce-framework/JUCE.git JUCE
 
       - name: Compilar
         working-directory: SampleDistort
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
-          cmake --build build --config Release
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64
+          cmake --build build --config Release --parallel 3
 
       - name: Firmar en ad-hoc
         working-directory: SampleDistort
