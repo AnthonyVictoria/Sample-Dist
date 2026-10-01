@@ -15,25 +15,23 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
       - name: Clonar JUCE
-        working-directory: SampleDistort
         run: git clone --depth 1 --branch 9.0.3 https://github.com/juce-framework/JUCE.git JUCE
 
       - name: Compilar
-        working-directory: SampleDistort
         run: |
           set -o pipefail
-          sed -i '' 's/COPY_PLUGIN_AFTER_BUILD TRUE/COPY_PLUGIN_AFTER_BUILD FALSE/' CMakeLists.txt
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 2>&1 | tee ../cmake-out.txt
-          cmake --build build --config Release --parallel 3 2>&1 | tee ../build-out.txt
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 2>&1 | tee cmake-out.txt
+          cmake --build build --config Release --parallel 3 2>&1 | tee build-out.txt
 
-      - name: Firmar en ad-hoc
-        working-directory: SampleDistort
-        run: codesign --force --deep --sign - "build/SampleDistort_artefacts/Release/VST3/Sample Distort.vst3"
+      - name: Firmar y empaquetar
+        run: |
+          codesign --force --deep --sign - "build/SampleDistort_artefacts/Release/VST3/ShaqkeeDistort.vst3"
+          ditto -c -k --keepParent "build/SampleDistort_artefacts/Release/VST3/ShaqkeeDistort.vst3" ShaqkeeDistort-mac.zip
 
       - uses: actions/upload-artifact@v4
         with:
-          name: SampleDistort-VST3
-          path: SampleDistort/build/SampleDistort_artefacts/Release/VST3/Sample Distort.vst3
+          name: ShaqkeeDistort-VST3
+          path: ShaqkeeDistort-mac.zip
 
       - name: Guardar log
         if: always()
