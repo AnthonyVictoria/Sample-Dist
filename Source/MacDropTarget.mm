@@ -1,6 +1,6 @@
 #include "MacDropTarget.h"
 
-#if JUCE_MAC
+#if defined(__APPLE__)
  #import <Cocoa/Cocoa.h>
 
 @interface ShaqDropCatcher : NSView
@@ -26,19 +26,19 @@
 
 - (NSView*)hitTest:(NSPoint)point
 {
-    juce::ignoreUnused(point);
+    (void) point;
     return nil;
 }
 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
 {
-    juce::ignoreUnused(sender);
+    (void) sender;
     return NSDragOperationCopy;
 }
 
 - (BOOL)prepareForDragOperation:(id<NSDraggingInfo>)sender
 {
-    juce::ignoreUnused(sender);
+    (void) sender;
     return YES;
 }
 
@@ -69,12 +69,12 @@
 }
 @end
 
-void installMacDropTarget(void* nativeView, std::function<void(const juce::String&)> callback)
+void installMacDropTarget(void* nativeView, std::function<void(const std::string&)> callback)
 {
     if (nativeView == nullptr)
         return;
 
-    auto* view = static_cast<NSView*>(nativeView);
+    NSView* view = (NSView*) nativeView;
     [view registerForDraggedTypes:@[
         NSPasteboardTypeFileURL,
         NSPasteboardTypeURL,
@@ -83,15 +83,15 @@ void installMacDropTarget(void* nativeView, std::function<void(const juce::Strin
         @"public.file-url"
     ]];
 
-    auto* catcher = [[ShaqDropCatcher alloc] initWithFrame:view.bounds];
+    ShaqDropCatcher* catcher = [[ShaqDropCatcher alloc] initWithFrame:view.bounds];
     catcher.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     catcher.callback = ^(NSString* path)
     {
-        juce::String p(path.UTF8String);
-        juce::MessageManager::callAsync([callback, p] { callback(p); });
+        std::string p(path.UTF8String);
+        callback(p);
     };
     [view addSubview:catcher positioned:NSWindowBelow relativeTo:nil];
 }
 #else
-void installMacDropTarget(void*, std::function<void(const juce::String&)>) {}
+void installMacDropTarget(void*, std::function<void(const std::string&)>) {}
 #endif
