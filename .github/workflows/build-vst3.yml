@@ -1,0 +1,31 @@
+name: Build VST3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clonar JUCE
+        working-directory: SampleDistort
+        run: git clone --depth 1 https://github.com/juce-framework/JUCE.git JUCE
+
+      - name: Compilar
+        working-directory: SampleDistort
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          cmake --build build --config Release
+
+      - name: Firmar en ad-hoc
+        working-directory: SampleDistort
+        run: codesign --force --deep --sign - "build/SampleDistort_artefacts/Release/VST3/Sample Distort.vst3"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SampleDistort-VST3
+          path: SampleDistort/build/SampleDistort_artefacts/Release/VST3/Sample Distort.vst3
